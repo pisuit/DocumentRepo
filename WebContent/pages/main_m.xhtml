@@ -1,0 +1,296 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<f:view xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:pm="http://primefaces.org/mobile"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	renderKitId="PRIMEFACES_MOBILE">
+	<pm:page title="Document">
+		<f:facet name="postinit">
+			<style type="text/css">
+.button_left .ui-btn {
+	text-align: left;
+}
+
+.back_button .ui-btn-inner {
+	font-size: 12.5px !important;
+	overflow: visible !important;
+}
+
+.back_button .ui-btn {
+	margin: 0 0 0 5px !important;
+	height: 29px;
+	width: 71px;
+}
+
+.logout_button .ui-btn-inner {
+	font-size: 12.5px !important;
+	overflow: visible !important;
+}
+
+.logout_button .ui-btn {
+	margin: 0 0 5 0px !important;
+	height: 29px;
+	width: 82px;
+}
+</style>
+		</f:facet>
+		<pm:view id="login_view" swatch="b"
+			rendered="#{!layoutHandler.loggedIn}">
+			<pm:header title="Document" swatch="b" fixed="true">
+				<f:facet name="right">
+					<a href="http://online.aerothai.co.th/documents/document_m.pdf"
+						target="_blank"> <h:outputText value="Manual" />
+					</a>
+				</f:facet>
+			</pm:header>
+			<pm:content>
+				<h:form id="loginform">
+					<p:outputPanel id="login_box">
+						<p:inputText value="#{loginManager.username}" id="username" />
+						<p:password value="#{loginManager.password}" id="password" />
+						<p:watermark value="Username" for="username" />
+						<p:watermark value="Password" for="password" />
+						<p:messages id="message" />
+						<p:separator />
+						<p:commandButton value="Login" icon="check"
+							action="#{loginManager.loginStaff('m')}" update="message" />
+					</p:outputPanel>
+				</h:form>
+			</pm:content>
+			<pm:footer fixed="true" style="height:33px">
+				<h:panelGroup style="width:100%;text-align:center;margin-top:8px"
+					layout="block">
+					<h:outputText value="Developed by ID.IT." />
+				</h:panelGroup>
+				<h:outputLink value="main.jsf"
+					style="position:absolute;top:0px;right:0px">
+					<h:outputText value="Desktop Ver." />
+				</h:outputLink>
+			</pm:footer>
+		</pm:view>
+		<pm:view id="meeting_view" swatch="b">
+			<pm:header title="Document" swatch="b" fixed="true">
+				<f:facet name="right">
+					<h:form>
+						<p:outputPanel style=" margin-top: 3px;"
+							styleClass="logout_button">
+							<p:commandButton value="Logout" icon="delete"
+								action="#{mobile.logout()}" />
+						</p:outputPanel>
+					</h:form>
+				</f:facet>
+			</pm:header>
+			<pm:content>
+				<h:form id="meetingform">
+					<p:outputPanel id="category_box">
+						<ui:repeat var="category" value="#{mobile.categoryList}">
+							<p:panel header="#{category}" collapsed="true">
+								<pm:buttonGroup styleClass="button_left">
+									<ui:repeat var="meeting" value="#{category.subCategoryList}">
+										<p:commandButton value="#{meeting.description}"
+											action="#{mobile.createRootDocument(meeting)}" icon="arrow-r"
+											iconPos="right" update=":rootform:root_box, :currentlocation" />
+									</ui:repeat>
+								</pm:buttonGroup>
+							</p:panel>
+						</ui:repeat>
+					</p:outputPanel>
+				</h:form>
+			</pm:content>
+			<pm:footer fixed="true" style="height:33px">
+				<h:panelGroup style="width:100%;text-align:center;margin-top:8px"
+					layout="block">
+					<h:outputText value="Developed by ID.IT." />
+				</h:panelGroup>
+				<h:outputLink value="main.jsf"
+					style="position:absolute;top:0px;right:0px">
+					<h:outputText value="Desktop Ver." />
+				</h:outputLink>
+			</pm:footer>
+		</pm:view>
+		<pm:view id="root_view" swatch="b">
+			<pm:header title="Document" swatch="b" fixed="true">
+				<f:facet name="left">
+					<p:button value="Back" icon="back"
+						href="#meeting_view?reverse=true" />
+				</f:facet>
+				<f:facet name="right">
+					<h:form>
+						<p:outputPanel style=" margin-top: 3px;"
+							styleClass="logout_button">
+							<p:commandButton value="Logout" icon="delete"
+								action="#{mobile.logout()}" />
+						</p:outputPanel>
+					</h:form>
+				</f:facet>
+				<p:outputPanel styleClass="ui-li ui-li-divider ui-bar-a"
+					style="text-align:center" id="currentlocation">
+					<h:outputText value="#{mobile.currentLocation}" />
+				</p:outputPanel>
+			</pm:header>
+			<pm:content>
+				<h:form id="rootform">
+					<p:outputPanel id="root_box" styleClass="button_left">
+						<ui:repeat var="document" value="#{mobile.documentList}">
+							<p:commandButton value="#{document.fileName}" icon="arrow-r"
+								iconPos="right" action="#{mobile.viewTraverse(document)}"
+								update=":documentform#{document.id}:document_box#{document.id}, :currentlocation#{document.id}" />
+						</ui:repeat>
+					</p:outputPanel>
+				</h:form>
+			</pm:content>
+			<pm:footer fixed="true" style="height:33px">
+				<h:panelGroup style="width:100%;text-align:center;margin-top:8px"
+					layout="block">
+					<h:outputText value="Developed by ID.IT." />
+				</h:panelGroup>
+				<h:outputLink value="main.jsf"
+					style="position:absolute;top:0px;right:0px">
+					<h:outputText value="Desktop Ver." />
+				</h:outputLink>
+			</pm:footer>
+		</pm:view>
+		<c:forEach var="viewid" items="#{mobile.viewList}">
+			<pm:view id="document_view#{viewid}" swatch="b">
+				<pm:header title="Document" swatch="b" fixed="true">
+					<f:facet name="left">
+						<h:form>
+							<p:outputPanel style=" margin-top: 3px; position: absolute;"
+								styleClass="back_button">
+								<p:commandButton value="Back" icon="back"
+									action="#{mobile.viewBackward()}"
+									update="#{mobile.updatedView}" />
+							</p:outputPanel>
+						</h:form>
+					</f:facet>
+					<f:facet name="right">
+						<h:form>
+							<p:outputPanel style=" margin-top: 3px;"
+								styleClass="logout_button">
+								<p:commandButton value="Logout" icon="delete"
+									action="#{mobile.logout()}" />
+							</p:outputPanel>
+						</h:form>
+					</f:facet>
+					<p:outputPanel styleClass="ui-li ui-li-divider ui-bar-a"
+						style="text-align:center" id="currentlocation#{viewid}">
+						<h:outputText value="#{mobile.currentLocation}" />
+					</p:outputPanel>
+				</pm:header>
+				<pm:content>
+					<h:form id="documentform#{viewid}">
+						<p:outputPanel id="document_box#{viewid}" styleClass="button_left">
+							<ui:repeat var="document" value="#{mobile.documentList}">
+								<p:commandButton value="#{document.fileName}" icon="arrow-r"
+									iconPos="right" action="#{mobile.viewTraverse(document)}"
+									update=":documentform#{document.id}:document_box#{document.id}, :currentlocation#{document.id}"
+									rendered="#{document.folder == true}" />
+								<p:outputPanel
+									rendered="#{document.folder == false and mobile.loggedOn and mobile.checkRestriction(document)}"
+									style="display:block;margin-top:8px;background-color:white;opacity:0.5;border-radius:5px">
+									<h:graphicImage library="images" name="text.png"
+										style="height:20px;width:20px;margin-left:10px;margin-bottom:-3px"
+										rendered="#{!fn:containsIgnoreCase(document.fileName, '.pdf') and !fn:containsIgnoreCase(document.fileName, '.doc') and !fn:containsIgnoreCase(document.fileName, '.docx') and !fn:containsIgnoreCase(document.fileName, '.xls') and !fn:containsIgnoreCase(document.fileName, '.xlsx') and !fn:containsIgnoreCase(document.fileName, '.ppt') and !fn:containsIgnoreCase(document.fileName, '.pptx') and !fn:containsIgnoreCase(document.fileName, '.jpg') and !fn:containsIgnoreCase(document.fileName, '.tiff') and !fn:containsIgnoreCase(document.fileName, '.gif') and !fn:containsIgnoreCase(document.fileName, '.bmp') and !fn:containsIgnoreCase(document.fileName, '.png')}" />
+									<h:graphicImage library="images" name="pdf.png"
+										style="height:20px;width:20px;margin-left:10px;margin-bottom:-3px"
+										rendered="#{fn:containsIgnoreCase(document.fileName, '.pdf')}" />
+									<h:graphicImage library="images" name="doc.png"
+										style="height:20px;width:20px;margin-left:10px;margin-bottom:-3px"
+										rendered="#{fn:containsIgnoreCase(document.fileName, '.doc') || fn:containsIgnoreCase(document.fileName, '.docx')}" />
+									<h:graphicImage library="images" name="ppt.png"
+										style="height:20px;width:20px;margin-left:10px;margin-bottom:-3px"
+										rendered="#{fn:containsIgnoreCase(document.fileName, '.ppt') || fn:containsIgnoreCase(document.fileName, '.pptx')}" />
+									<h:graphicImage library="images" name="xls.png"
+										style="height:20px;width:20px;margin-left:10px;margin-bottom:-3px"
+										rendered="#{fn:containsIgnoreCase(document.fileName, '.xls') || fn:containsIgnoreCase(document.fileName, '.xlsx')}" />
+									<h:graphicImage library="images" name="img.png"
+										style="height:20px;width:20px;margin-left:10px;margin-bottom:-3px"
+										rendered="#{fn:containsIgnoreCase(document.fileName, '.jpg') || fn:containsIgnoreCase(document.fileName, '.tiff') || fn:containsIgnoreCase(document.fileName, '.gif') || fn:containsIgnoreCase(document.fileName, '.bmp') || fn:containsIgnoreCase(document.fileName, '.png')}" />
+									<a
+										href="#{facesContext.externalContext.requestContextPath}/FileDownloadServlet/#{document.fileName}?id=#{document.id}"
+										target="_blank"> <h:outputText
+											value="#{document.fileName}" />
+									</a>
+									<br />
+									<h:outputText value="[ #{document.description} ]"
+										style="margin-left:34px"
+										rendered="#{document.description != null}" />
+								</p:outputPanel>
+								<p:outputPanel
+									rendered="#{document.folder == false and !mobile.loggedOn}"
+									style="display:block;margin-top:8px;background-color:white;opacity:0.5;border-radius:5px">
+									<h:graphicImage library="images" name="text.png"
+										style="height:20px;width:20px;margin-left:10px;margin-bottom:-3px"
+										rendered="#{!fn:containsIgnoreCase(document.fileName, '.pdf') and !fn:containsIgnoreCase(document.fileName, '.doc') and !fn:containsIgnoreCase(document.fileName, '.docx') and !fn:containsIgnoreCase(document.fileName, '.xls') and !fn:containsIgnoreCase(document.fileName, '.xlsx') and !fn:containsIgnoreCase(document.fileName, '.ppt') and !fn:containsIgnoreCase(document.fileName, '.pptx') and !fn:containsIgnoreCase(document.fileName, '.jpg') and !fn:containsIgnoreCase(document.fileName, '.tiff') and !fn:containsIgnoreCase(document.fileName, '.gif') and !fn:containsIgnoreCase(document.fileName, '.bmp') and !fn:containsIgnoreCase(document.fileName, '.png')}" />
+									<h:graphicImage library="images" name="pdf.png"
+										style="height:20px;width:20px;margin-left:10px;margin-bottom:-3px"
+										rendered="#{fn:containsIgnoreCase(document.fileName, '.pdf')}" />
+									<h:graphicImage library="images" name="doc.png"
+										style="height:20px;width:20px;margin-left:10px;margin-bottom:-3px"
+										rendered="#{fn:containsIgnoreCase(document.fileName, '.doc') || fn:containsIgnoreCase(document.fileName, '.docx')}" />
+									<h:graphicImage library="images" name="ppt.png"
+										style="height:20px;width:20px;margin-left:10px;margin-bottom:-3px"
+										rendered="#{fn:containsIgnoreCase(document.fileName, '.ppt') || fn:containsIgnoreCase(document.fileName, '.pptx')}" />
+									<h:graphicImage library="images" name="xls.png"
+										style="height:20px;width:20px;margin-left:10px;margin-bottom:-3px"
+										rendered="#{fn:containsIgnoreCase(document.fileName, '.xls') || fn:containsIgnoreCase(document.fileName, '.xlsx')}" />
+									<h:graphicImage library="images" name="img.png"
+										style="height:20px;width:20px;margin-left:10px;margin-bottom:-3px"
+										rendered="#{fn:containsIgnoreCase(document.fileName, '.jpg') || fn:containsIgnoreCase(document.fileName, '.tiff') || fn:containsIgnoreCase(document.fileName, '.gif') || fn:containsIgnoreCase(document.fileName, '.bmp') || fn:containsIgnoreCase(document.fileName, '.png')}" />
+									<h:outputText value="#{document.fileName}"
+										style="font-weight:bold;color:#2489CE;margin-left:7px" />
+									<br />
+									<h:outputText value="[ #{document.description} ]"
+										style="margin-left:34px"
+										rendered="#{document.description != null}" />
+								</p:outputPanel>
+								<p:outputPanel
+									rendered="#{document.folder == false and mobile.loggedOn and !memberAssign.checkRestriction(document)}"
+									style="display:block;margin-top:8px;background-color:white;opacity:0.5;border-radius:5px">
+									<h:graphicImage library="images" name="text.png"
+										style="height:20px;width:20px;margin-left:10px;margin-bottom:-3px"
+										rendered="#{!fn:containsIgnoreCase(document.fileName, '.pdf') and !fn:containsIgnoreCase(document.fileName, '.doc') and !fn:containsIgnoreCase(document.fileName, '.docx') and !fn:containsIgnoreCase(document.fileName, '.xls') and !fn:containsIgnoreCase(document.fileName, '.xlsx') and !fn:containsIgnoreCase(document.fileName, '.ppt') and !fn:containsIgnoreCase(document.fileName, '.pptx') and !fn:containsIgnoreCase(document.fileName, '.jpg') and !fn:containsIgnoreCase(document.fileName, '.tiff') and !fn:containsIgnoreCase(document.fileName, '.gif') and !fn:containsIgnoreCase(document.fileName, '.bmp') and !fn:containsIgnoreCase(document.fileName, '.png')}" />
+									<h:graphicImage library="images" name="pdf.png"
+										style="height:20px;width:20px;margin-left:10px;margin-bottom:-3px"
+										rendered="#{fn:containsIgnoreCase(document.fileName, '.pdf')}" />
+									<h:graphicImage library="images" name="doc.png"
+										style="height:20px;width:20px;margin-left:10px;margin-bottom:-3px"
+										rendered="#{fn:containsIgnoreCase(document.fileName, '.doc') || fn:containsIgnoreCase(document.fileName, '.docx')}" />
+									<h:graphicImage library="images" name="ppt.png"
+										style="height:20px;width:20px;margin-left:10px;margin-bottom:-3px"
+										rendered="#{fn:containsIgnoreCase(document.fileName, '.ppt') || fn:containsIgnoreCase(document.fileName, '.pptx')}" />
+									<h:graphicImage library="images" name="xls.png"
+										style="height:20px;width:20px;margin-left:10px;margin-bottom:-3px"
+										rendered="#{fn:containsIgnoreCase(document.fileName, '.xls') || fn:containsIgnoreCase(document.fileName, '.xlsx')}" />
+									<h:graphicImage library="images" name="img.png"
+										style="height:20px;width:20px;margin-left:10px;margin-bottom:-3px"
+										rendered="#{fn:containsIgnoreCase(document.fileName, '.jpg') || fn:containsIgnoreCase(document.fileName, '.tiff') || fn:containsIgnoreCase(document.fileName, '.gif') || fn:containsIgnoreCase(document.fileName, '.bmp') || fn:containsIgnoreCase(document.fileName, '.png')}" />
+									<h:outputText value="#{document.fileName}"
+										style="font-weight:bold;color:#2489CE;margin-left:7px" />
+									<br />
+									<h:outputText value="[ #{document.description} ]"
+										style="margin-left:34px"
+										rendered="#{document.description != null}" />
+								</p:outputPanel>
+							</ui:repeat>
+						</p:outputPanel>
+					</h:form>
+				</pm:content>
+				<pm:footer fixed="true" style="height:33px">
+					<h:panelGroup style="width:100%;text-align:center;margin-top:8px"
+						layout="block">
+						<h:outputText value="Developed by ID.IT." />
+					</h:panelGroup>
+					<h:outputLink value="main.jsf"
+						style="position:absolute;top:0px;right:0px">
+						<h:outputText value="Desktop Ver." />
+					</h:outputLink>
+				</pm:footer>
+			</pm:view>
+		</c:forEach>
+	</pm:page>
+</f:view>

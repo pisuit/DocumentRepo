@@ -1,0 +1,53 @@
+@CHARSET "TIS-620";
+
+#wrapper {
+	/*float:left;*/
+	clear:both;
+	height: 0px;
+	/*width: 0px;*/
+}
+
+.label {
+	float:left;
+	width:75px;
+	margin-right:10px;
+	margin-bottom: 5px;
+	text-align: left;
+}
+
+.label.small {
+	float:left;
+	width:50px;
+	margin-right:10px;
+	margin-bottom: 5px;
+	text-align: left;
+}
+
+.label.large {
+	float:left;
+	width:100px;
+	margin-right:10px;
+	margin-bottom: 5px;
+	text-align: left;
+}
+
+.input {
+	float:left;
+	width:100px;
+	margin-right: 10px;
+	margin-bottom: 5px;
+}
+
+.input.small {
+	float:left;
+	width:80px;
+	margin-right: 10px;
+	margin-bottom: 5px;
+}
+
+.input.large {
+	float:left;
+	width:20px;
+	margin-right: 10px;
+	margin-bottom: 5px;
+}

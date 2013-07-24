@@ -1,0 +1,889 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:pm="http://primefaces.org/mobile">
+
+<pe:head title="Document Directory">
+	<style type="text/css">
+html {
+	overflow: auto !important
+}
+
+body {
+	font-family: Arial, "Trebuchet MS", Verdana, sans-serif;
+	font-size: 12px;
+	padding: 0 !important;
+	margin: 0;
+}
+
+input,select,textarea,button,.ui-widget,.ui-widget input,.ui-widget select,.ui-widget textarea,.ui-widget button
+	{
+	font-family: Arial, "Trebuchet MS", Verdana, sans-serif;
+	font-size: 12px !important;
+}
+
+.ui-widget-header,.ui-widget-content,.ui-widget-header .ui-widget-header,.ui-widget-content .ui-widget-content
+	{
+	font-family: Arial, "Trebuchet MS", Verdana, sans-serif;
+	font-size: 12px !important;
+}
+
+.ui-growl {
+	position: fixed;
+	top: 10%;
+	z-index: 9999;
+}
+
+.pe-layout-pane-content {
+	padding: 0ex !important;
+}
+
+.headerbg {
+	background-image: url("../resources/images/titledoc.jpg");
+	background-repeat: no-repeat;
+	height: 50px;
+}
+
+.column-head-center th {
+	text-align: center !important;
+}
+
+.mobilever_button .ui-button-text {
+	display: inline;
+}
+
+.ui-state-highlight .ui-icon {
+	background-image:
+		url("/document/javax.faces.resource/images/ui-icons_333333_256x240.png.jsf?ln=primefaces-bootstrap");
+}
+
+.panelgridNoBorder tr,.panelgridNoBorder td {
+	border: none;
+}
+
+.ui-tooltip-content {
+	width: auto;
+}
+
+.ui-tooltip,.qtip {
+	max-width: none;
+}
+
+.ui-tree .ui-tree-nodes .ui-tree-node {
+	margin: 0 0 0 0;
+}
+</style>
+
+	<f:facet name="first">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta http-equiv="pragma" content="no-cache" />
+		<meta http-equiv="cache-control" content="no-cache" />
+		<meta http-equiv="expires" content="0" />
+	</f:facet>
+</pe:head>
+<body>
+	<p:blockUI block=":mainform:maintab:tableblockuicontainer"
+		widgetVar="blockTable">
+		<h:outputText value="LOADING" />
+		<h:graphicImage value="../resources/images/ajax-loading.gif" />
+	</p:blockUI>
+	<p:blockUI block=":mainform:maintab" widgetVar="blockTab">
+		<h:outputText value="LOADING" />
+		<h:graphicImage value="../resources/images/ajax-loading.gif" />
+	</p:blockUI>
+	<p:blockUI block=":mainform:maintab:memberinputpanelgroup"
+		widgetVar="blockMemberAssign">
+		<h:outputText value="LOADING" />
+		<h:graphicImage value="../resources/images/ajax-loading.gif" />
+	</p:blockUI>
+	<p:blockUI block=":westform:categorytreecontainer"
+		widgetVar="blockCategoryTree">
+		<h:outputText value="LOADING" />
+		<h:graphicImage value="../resources/images/ajax-loading.gif" />
+	</p:blockUI>
+	<p:blockUI block=":mainform:maintab:loglistpanelgroup"
+		widgetVar="blockLogList">
+		<h:outputText value="LOADING" />
+		<h:graphicImage value="../resources/images/ajax-loading.gif" />
+	</p:blockUI>
+	<p:blockUI block="centercontainer"
+		widgetVar="blockCenterLayout">
+		<h:outputText value="LOADING" />
+		<h:graphicImage value="../resources/images/ajax-loading.gif" />
+	</p:blockUI>
+	<p:growl id="growl" autoUpdate="true" showDetail="true" life="5000" />
+	<pe:layout id="fullpage" widgetVar="layoutWidget" rendered="true">
+		<pe:layoutPane position="north" size="43"
+			styleContent="overflow:hidden" closable="false" resizable="false">
+			<p:notificationBar position="top" effect="slide" widgetVar="bar"
+				style="z-index:9999999999999999999999999;opacity:0.7;height:28px;text-align:center;background:red">
+				<h:outputText
+					value="ข้อมูลมีการเปลี่ยนแปลง อย่าลืมกดบันทึกนะครับ !!"
+					style="font-size:30px;color:white" />
+			</p:notificationBar>
+			<h:form id="northform">
+				<h:panelGroup layout="block" styleClass="headerbg">
+					<h:panelGrid columns="6" cellpadding="3" cellspacing="0"
+						id="logingrid" style="float:right">
+						<h:outputText value="Username: "
+							rendered="#{!layoutHandler.loggedIn}" />
+						<p:inputText value="#{loginManager.username}"
+							rendered="#{!layoutHandler.loggedIn}" />
+						<h:outputText value="Password: "
+							rendered="#{!layoutHandler.loggedIn}" />
+						<p:password value="#{loginManager.password}"
+							rendered="#{!layoutHandler.loggedIn}" />
+						<p:commandButton value="Login" icon="ui-icon-power"
+							action="#{loginManager.loginStaff('d')}"
+							process="@this, logingrid" rendered="#{!layoutHandler.loggedIn}"
+							id="loginbtn" />
+					</h:panelGrid>
+					<h:panelGrid columns="3" style="float:right;padding-top:8px">
+						<h:outputText value="Logged In as: "
+							rendered="#{layoutHandler.loggedIn}" />
+						<h:outputText value="#{layoutHandler.name}"
+							rendered="#{layoutHandler.loggedIn}" />
+						<p:commandLink value="Logout" action="#{loginManager.logout()}"
+							process="@this" rendered="#{layoutHandler.loggedIn}"
+							style="font-weight:bold;margin-left:5px" />
+					</h:panelGrid>
+				</h:panelGroup>
+			</h:form>
+		</pe:layoutPane>
+		<pe:layoutPane position="west" size="200" resizable="true"
+			id="westlayout" initClosed="false" closable="true"
+			styleContent="overflow-x:hidden">
+			<h:form id="westform">
+				<f:facet name="header">
+					<h:outputText value="Category" />
+				</f:facet>
+				<h:panelGroup id="categorytreecontainer" layout="block">
+					<p:tree style="border:0;padding:0em;width:500px" id="categorytree"
+						value="#{memberAssign.categoryRootTree}" var="node"
+						selectionMode="single"
+						selection="#{memberAssign.selectedCategoryNode}" highlight="true">
+						<p:ajax event="expand" listener="#{memberAssign.setExpand()}"
+							process="@this" />
+						<p:ajax event="collapse" listener="#{memberAssign.setCollapse()}"
+							process="@this" />
+						<p:ajax event="select"
+							listener="#{memberAssign.createDocumentTree()}" process="@this"
+							update=":mainform:maintab:treetablecontainer, :mainform:maintab:memberinputpanelgrid, :mainform:maintab:membertablecontainer, :mainform:maintab:buttongrid, categorytree"
+							onstart="blockCenterLayout.show()" oncomplete="blockCenterLayout.hide()" />
+						<p:treeNode type="default">
+							<h:outputText value="#{node}" />
+						</p:treeNode>
+						<p:treeNode type="meeting">
+							<h:outputText value="#{node}" />
+						</p:treeNode>
+					</p:tree>
+				</h:panelGroup>
+			</h:form>
+		</pe:layoutPane>
+		<pe:layoutPane position="center">
+			<h:panelGroup layout="block" id="centercontainer" style="height:100%">
+				<h:form id="mainform" enctype="multipart/form-data">
+					<p:contextMenu for=":westform:categorytree"
+						rendered="#{memberAssign.firstLevelAdmin}">
+						<p:menuitem value="Edit" icon="ui-icon-pencil"
+							oncomplete="editCategoryWidget.show()" process="@this"
+							action="#{memberAssign.prepareEditCategory()}"
+							update=":editcategorygrid" />
+						<p:menuitem value="Reorder" icon="ui-icon-arrowthick-2-n-s"
+							oncomplete="reorderWidget.show()" update=":ordergrid"
+							action="#{memberAssign.createOrderList()}" process="@this" />
+						<p:menuitem value="Delete" icon="ui-icon-trash"
+							oncomplete="deleteCategoryConfirm.show()" process="@this" />
+					</p:contextMenu>
+					<p:tabView style="height:99%" id="maintab"
+						activeIndex="#{memberAssign.tabIndex}">
+						<p:tab id="documenttab" title="Document">
+							<h:panelGroup id="tableblockuicontainer" layout="block">
+								<h:panelGroup id="treetablecontainer" layout="block">
+									<p:treeTable value="#{memberAssign.documentRootTree}" var="doc"
+										id="documentlist"
+										selection="#{memberAssign.selectedDocumentNode}"
+										selectionMode="single" styleClass="column-head-center">
+										<p:ajax event="select" update="documentlist" process="@this"
+											listener="#{memberAssign.treeTableSelected()}" />
+										<p:ajax event="expand" process="@this"
+											listener="#{memberAssign.preserveExpandState()}" />
+										<p:ajax event="collapse" process="@this"
+											listener="#{memberAssign.preserveCollapseState()}" />
+										<f:facet name="footer">
+											<p:commandButton value="Refresh" icon="ui-icon-refresh"
+												style="float:left" process="@this"
+												update=":mainform:maintab:treetablecontainer"
+												onstart="blockTable.show()" oncomplete="blockTable.hide()"
+												disabled="#{memberAssign.documentRootTree == null}"
+												action="#{memberAssign.createDocumentTree()}" />
+											<p:commandButton value="Upload Files" icon="ui-icon-copy"
+												style="float:right"
+												disabled="#{(memberAssign.selectedDocumentNode == null) || (memberAssign.selectedDocumentNode != null and memberAssign.selectedDocumentNode.type == 'file') || !memberAssign.meetingAdmin}"
+												onclick="fileUploadWidget.show();" type="button" />
+											<p:commandButton value="Create New Folder" type="button"
+												style="float:right" onclick="createNewFolderWidget.show()"
+												disabled="#{memberAssign.selectedCategoryNode == null || !memberAssign.meetingAdmin || memberAssign.selectedDocumentNode.type == 'file'}"
+												icon="ui-icon-circle-plus" />
+											<p:commandButton value="Create Sub Folder" type="button"
+												rendered="false" onclick="createSubFolderWidget.show()"
+												icon="ui-icon-plus"
+												disabled="#{(memberAssign.selectedDocumentNode == null) || (memberAssign.selectedDocumentNode != null and memberAssign.selectedDocumentNode.type == 'file') || !memberAssign.meetingAdmin}" />
+											<p:remoteCommand name="nulltifyDescription">
+												<f:setPropertyActionListener
+													target="#{memberAssign.fileDescription}" value="#{null}" />
+											</p:remoteCommand>
+										</f:facet>
+										<p:column headerText="Name" style="width:25%">
+											<h:graphicImage library="images" name="generic_folder.png"
+												style="margin-right:3px;height:16px;width:16px;margin-bottom:-2px"
+												rendered="#{doc.folder == true}" />
+											<h:graphicImage library="images" name="pdf.png"
+												style="margin-right:3px;height:16px;width:16px;margin-bottom:-2px"
+												rendered="#{doc.folder == false and fn:containsIgnoreCase(doc.fileName, '.pdf')}" />
+											<h:graphicImage library="images" name="doc.png"
+												style="margin-right:3px;height:16px;width:16px;margin-bottom:-2px"
+												rendered="#{doc.folder == false and (fn:containsIgnoreCase(doc.fileName, '.doc') || fn:containsIgnoreCase(doc.fileName, '.docx'))}" />
+											<h:graphicImage library="images" name="ppt.png"
+												style="margin-right:3px;height:16px;width:16px;margin-bottom:-2px"
+												rendered="#{doc.folder == false and (fn:containsIgnoreCase(doc.fileName, '.ppt') || fn:containsIgnoreCase(doc.fileName, '.pptx'))}" />
+											<h:graphicImage library="images" name="xls.png"
+												style="margin-right:3px;height:16px;width:16px;margin-bottom:-2px"
+												rendered="#{doc.folder == false and (fn:containsIgnoreCase(doc.fileName, '.xls') || fn:containsIgnoreCase(doc.fileName, '.xlsx'))}" />
+											<h:graphicImage library="images" name="img.png"
+												style="margin-right:3px;height:16px;width:16px;margin-bottom:-2px"
+												rendered="#{doc.folder == false and (fn:containsIgnoreCase(doc.fileName, '.jpg') || fn:containsIgnoreCase(doc.fileName, '.tiff') || fn:containsIgnoreCase(doc.fileName, '.gif') || fn:containsIgnoreCase(doc.fileName, '.bmp') || fn:containsIgnoreCase(doc.fileName, '.png'))}" />
+											<h:graphicImage library="images" name="text.png"
+												style="margin-right:3px;height:16px;width:16px;margin-bottom:-2px"
+												rendered="#{doc.folder == false and !fn:containsIgnoreCase(doc.fileName, '.pdf') and !fn:containsIgnoreCase(doc.fileName, '.doc') and !fn:containsIgnoreCase(doc.fileName, '.docx') and !fn:containsIgnoreCase(doc.fileName, '.xls') and !fn:containsIgnoreCase(doc.fileName, '.xlsx') and !fn:containsIgnoreCase(doc.fileName, '.ppt') and !fn:containsIgnoreCase(doc.fileName, '.pptx') and !fn:containsIgnoreCase(doc.fileName, '.jpg') and !fn:containsIgnoreCase(doc.fileName, '.tiff') and !fn:containsIgnoreCase(doc.fileName, '.gif') and !fn:containsIgnoreCase(doc.fileName, '.bmp') and !fn:containsIgnoreCase(doc.fileName, '.png')}" />
+											<p:commandLink action="#{memberAssign.download(doc)}"
+												value="#{doc.fileName}" process="@this" ajax="false"
+												id="link" style="text-decoration:none"
+												rendered="#{doc.folder == false and memberAssign.loggedOn and memberAssign.checkRestriction(doc)}" />
+											<h:outputText value="#{doc.fileName}"
+												rendered="#{doc.folder == true}" id="name1" />
+											<h:outputText value="#{doc.fileName}"
+												rendered="#{doc.folder == false and !memberAssign.loggedOn}"
+												id="name2" />
+											<h:outputText value="#{doc.fileName}"
+												rendered="#{doc.folder == false and memberAssign.loggedOn and !memberAssign.checkRestriction(doc)}"
+												id="name3" />
+											<pe:tooltip for="link" targetPosition="right center"
+												position="bottom left">
+												<p:panelGrid styleClass="panelgridNoBorder">
+													<p:row>
+														<p:column style="text-align:right">
+															<h:outputText value="Downloadable: " />
+														</p:column>
+														<p:column>
+															<h:outputText value="Yes" style="color:green" />
+														</p:column>
+													</p:row>
+													<p:row>
+														<p:column style="text-align:right">
+															<h:outputText value="Department Restriction: " />
+														</p:column>
+														<p:column>
+															<h:outputText value="No" style="color:red"
+																rendered="#{doc.rootFolder.departmentAuthorization == false}" />
+															<h:outputText value="Yes" style="color:green"
+																rendered="#{doc.rootFolder.departmentAuthorization == true}" />
+															<h:outputText value=" (#{doc.rootFolder.department})"
+																rendered="#{doc.rootFolder.departmentAuthorization == true}" />
+														</p:column>
+													</p:row>
+													<p:row>
+														<p:column style="text-align:right">
+															<h:outputText value="Position Restriction: " />
+														</p:column>
+														<p:column>
+															<h:outputText value="No" style="color:red"
+																rendered="#{doc.rootFolder.positionRestriction == false}" />
+															<h:outputText value="Yes" style="color:green"
+																rendered="#{doc.rootFolder.positionRestriction  == true}" />
+															<h:outputText
+																value=" (#{doc.rootFolder.positionType.value})"
+																rendered="#{doc.rootFolder.positionRestriction  == true}" />
+														</p:column>
+													</p:row>
+												</p:panelGrid>
+											</pe:tooltip>
+											<pe:tooltip for="name1" targetPosition="right center"
+												position="bottom left">
+												<p:panelGrid styleClass="panelgridNoBorder">
+													<p:row>
+														<p:column style="text-align:right">
+															<h:outputText value="Department Restriction: " />
+														</p:column>
+														<p:column>
+															<h:outputText value="No" style="color:red"
+																rendered="#{doc.departmentAuthorization == false}" />
+															<h:outputText value="Yes" style="color:green"
+																rendered="#{doc.departmentAuthorization == true}" />
+															<h:outputText value=" (#{doc.department})"
+																rendered="#{doc.departmentAuthorization == true}" />
+														</p:column>
+													</p:row>
+													<p:row>
+														<p:column style="text-align:right">
+															<h:outputText value="Position Restriction: " />
+														</p:column>
+														<p:column>
+															<h:outputText value="No" style="color:red"
+																rendered="#{doc.positionRestriction == false}" />
+															<h:outputText value="Yes" style="color:green"
+																rendered="#{doc.positionRestriction  == true}" />
+															<h:outputText value=" (#{doc.positionType.value})"
+																rendered="#{doc.positionRestriction  == true}" />
+														</p:column>
+													</p:row>
+												</p:panelGrid>
+											</pe:tooltip>
+											<pe:tooltip for="name2" targetPosition="right center"
+												position="bottom left">
+												<p:panelGrid styleClass="panelgridNoBorder">
+													<p:row>
+														<p:column style="text-align:right">
+															<h:outputText value="Downloadable: " />
+														</p:column>
+														<p:column>
+															<h:outputText value="No" style="color:red" />
+														</p:column>
+													</p:row>
+													<p:row>
+														<p:column style="text-align:right">
+															<h:outputText value="Department Restriction: " />
+														</p:column>
+														<p:column>
+															<h:outputText value="No" style="color:red"
+																rendered="#{doc.rootFolder.departmentAuthorization == false}" />
+															<h:outputText value="Yes" style="color:green"
+																rendered="#{doc.rootFolder.departmentAuthorization == true}" />
+															<h:outputText value=" (#{doc.rootFolder.department})"
+																rendered="#{doc.rootFolder.departmentAuthorization == true}" />
+														</p:column>
+													</p:row>
+													<p:row>
+														<p:column style="text-align:right">
+															<h:outputText value="Position Restriction: " />
+														</p:column>
+														<p:column>
+															<h:outputText value="No" style="color:red"
+																rendered="#{doc.rootFolder.positionRestriction == false}" />
+															<h:outputText value="Yes" style="color:green"
+																rendered="#{doc.rootFolder.positionRestriction  == true}" />
+															<h:outputText
+																value=" (#{doc.rootFolder.positionType.value})"
+																rendered="#{doc.rootFolder.positionRestriction  == true}" />
+														</p:column>
+													</p:row>
+												</p:panelGrid>
+											</pe:tooltip>
+											<pe:tooltip for="name3" targetPosition="right center"
+												position="bottom left">
+												<p:panelGrid styleClass="panelgridNoBorder">
+													<p:row>
+														<p:column style="text-align:right">
+															<h:outputText value="Downloadable: " />
+														</p:column>
+														<p:column>
+															<h:outputText value="No" style="color:red" />
+														</p:column>
+													</p:row>
+													<p:row>
+														<p:column style="text-align:right">
+															<h:outputText value="Department Restriction: " />
+														</p:column>
+														<p:column>
+															<h:outputText value="No" style="color:red"
+																rendered="#{doc.rootFolder.departmentAuthorization == false}" />
+															<h:outputText value="Yes" style="color:green"
+																rendered="#{doc.rootFolder.departmentAuthorization == true}" />
+															<h:outputText value=" (#{doc.rootFolder.department})"
+																rendered="#{doc.rootFolder.departmentAuthorization == true}" />
+														</p:column>
+													</p:row>
+													<p:row>
+														<p:column style="text-align:right">
+															<h:outputText value="Position Restriction: " />
+														</p:column>
+														<p:column>
+															<h:outputText value="No" style="color:red"
+																rendered="#{doc.rootFolder.positionRestriction == false}" />
+															<h:outputText value="Yes" style="color:green"
+																rendered="#{doc.rootFolder.positionRestriction  == true}" />
+															<h:outputText
+																value=" (#{doc.rootFolder.positionType.value})"
+																rendered="#{doc.rootFolder.positionRestriction  == true}" />
+														</p:column>
+													</p:row>
+												</p:panelGrid>
+											</pe:tooltip>
+										</p:column>
+										<p:column headerText="Description" style="width:47%">
+											<h:outputText value="#{doc.description}" id="desc" />
+										</p:column>
+										<p:column headerText="Size" style="width:7%;text-align:right">
+											<h:outputText value="#{doc.fileSize/1000}"
+												rendered="#{doc.fileSize != null and doc.fileSize > 1000}">
+												<f:convertNumber pattern="#,##0" />
+											</h:outputText>
+											<h:outputText value="#{doc.fileSize/1000}"
+												rendered="#{doc.fileSize != null and doc.fileSize lt 1000}">
+												<f:convertNumber pattern="0.000" />
+											</h:outputText>
+											<h:outputText value=" KB" rendered="#{doc.fileSize != null}" />
+										</p:column>
+										<p:column headerText="Timestamp"
+											style="width:12%;text-align:right">
+											<h:outputText value="#{doc.uploadTime}">
+												<f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT+7" />
+											</h:outputText>
+											<h:outputText value=" - "
+												rendered="#{doc.uploadTime != null}" />
+											<h:outputText value="#{doc.uploadTime}">
+												<f:convertDateTime pattern="HH:mm" timeZone="GMT+7" />
+											</h:outputText>
+										</p:column>
+										<p:column style="width:9%;text-align:center">
+											<p:commandButton process="@this" title="Edit"
+												icon="ui-icon-pencil" onclick="editDocumentWidget.show()"
+												update=":editdocform:editdocgrid, :editdocform:editdocbutngrid"
+												disabled="#{!memberAssign.meetingAdmin}"
+												style="width:16px;height:16px"
+												action="#{memberAssign.editDocumentSelected()}">
+												<f:setPropertyActionListener
+													target="#{memberAssign.editDocument}" value="#{doc}" />
+											</p:commandButton>
+											<p:commandButton title="Move" icon="ui-icon-transfer-e-w"
+												style="width:16px;height:16px;margin-left:3px"
+												process="@this"
+												action="#{memberAssign.createMoveDocumentTreeNode()}"
+												oncomplete="moveFileWidget.show()"
+												disabled="#{!memberAssign.meetingAdmin || doc.folder == true}"
+												update=":movefiledialog">
+												<f:setPropertyActionListener
+													target="#{memberAssign.editDocument}" value="#{doc}" />
+											</p:commandButton>
+											<p:commandButton process="@this" title="Delete"
+												icon="ui-icon-trash" onclick="deleteDocumentCOnfirm.show()"
+												disabled="#{!memberAssign.meetingAdmin}"
+												style="margin-left:3px;width:16px;height:16px">
+												<f:setPropertyActionListener
+													target="#{memberAssign.editDocument}" value="#{doc}" />
+											</p:commandButton>
+										</p:column>
+									</p:treeTable>
+								</h:panelGroup>
+							</h:panelGroup>
+						</p:tab>
+						<p:tab id="memberassigntab" title="Admin Assignment">
+							<h:panelGroup id="memberinputpanelgroup" layout="block">
+								<h:panelGrid columns="2" cellpadding="3"
+									id="memberinputpanelgrid"
+									rendered="#{memberAssign.firstLevelAdmin}">
+									<h:outputText value="Category" />
+									<p:autoComplete dropdown="true" size="74"
+										completeMethod="#{memberAssign.categoryCompleteMethod()}"
+										value="#{memberAssign.selectedCategory}" process="@this"
+										scrollHeight="200" var="category" itemLabel="#{category}"
+										itemValue="#{category}">
+										<p:column style="font-weight:bold">
+											<h:outputText value="#{category}" />
+										</p:column>
+									</p:autoComplete>
+									<h:outputText value="Sub-Category" />
+									<p:inputText size="80"
+										value="#{memberAssign.editSubCategory.description}" />
+									<h:outputText value="Member" />
+									<h:panelGroup>
+										<p:autoComplete dropdown="true" size="50"
+											completeMethod="#{employeeList.employeeCompleteMethod()}"
+											value="#{memberAssign.selectedStaff}" process="@this"
+											var="emp" itemValue="#{emp}" itemLabel="#{emp}"
+											converter="employeeConverter" forceSelection="true"
+											scrollHeight="210" id="memberautocomplete" minQueryLength="3">
+											<p:column>
+												<h:graphicImage value="/photo/#{emp.STAFFCODE}" width="50"
+													height="60" rendered="#{emp.STAFFCODE != '999999'}" />
+												<h:graphicImage value="../resources/images/boss.jpg"
+													width="50" height="60"
+													rendered="#{emp.STAFFCODE == '999999'}" />
+											</p:column>
+											<p:column style="font-weight:bold;">
+												<h:outputText value="ชื่อ: #{emp}" />
+												<br />
+												<h:outputText
+													value="สังกัด: #{emp.employeeAsList.get(0).DEPFINANCE}" />
+											</p:column>
+										</p:autoComplete>
+										<p:commandButton value="Add" style="margin-left:10px"
+											icon="ui-icon-plus"
+											action="#{memberAssign.saveMeetingMember()}"
+											update="membertablecontainer, memberautocomplete" />
+									</h:panelGroup>
+								</h:panelGrid>
+								<p:separator rendered="#{memberAssign.firstLevelAdmin}" />
+								<h:panelGrid columns="3" id="buttongrid"
+									rendered="#{memberAssign.firstLevelAdmin}">
+									<p:commandButton value="Save" icon="ui-icon-disk"
+										action="#{memberAssign.validateAssign()}"
+										update="memberinputpanelgrid, membertablecontainer, :westform:categorytree, buttongrid"
+										onstart="blockMemberAssign.show()"
+										oncomplete="blockMemberAssign.hide()" />
+									<p:commandButton value="Reset" icon="ui-icon-refresh"
+										action="#{memberAssign.resetValue()}"
+										update="memberinputpanelgrid, membertablecontainer, buttongrid"
+										process="@this" onstart="blockMemberAssign.show()"
+										oncomplete="blockMemberAssign.hide()" />
+									<p:commandButton value="Copy" icon="ui-icon-copy"
+										process="@this" action="#{memberAssign.copyMeeting()}"
+										update="buttongrid"
+										rendered="#{memberAssign.editSubCategory.id != null}" />
+									<p:commandButton value="Copied" icon="ui-icon-copy"
+										disabled="true" rendered="#{memberAssign.copied}" />
+								</h:panelGrid>
+								<p:separator rendered="#{memberAssign.firstLevelAdmin}" />
+								<p:spacer height="5" rendered="#{memberAssign.firstLevelAdmin}" />
+								<h:panelGroup id="membertablecontainer" layout="block">
+									<p:dataTable value="#{memberAssign.memberDataModel}"
+										var="member" id="memberlist">
+										<p:column>
+											<h:graphicImage
+												value="/photo/#{member.personalInfo.STAFFCODE}" width="50"
+												height="60"
+												rendered="#{member.personalInfo.STAFFCODE != '999999'}" />
+											<h:graphicImage value="../resources/images/boss.jpg"
+												width="50" height="60"
+												rendered="#{member.personalInfo.STAFFCODE == '999999'}" />
+										</p:column>
+										<p:column headerText="Name - Surname" style="width:80%">
+											<h:outputText value="#{member.personalInfo}" />
+										</p:column>
+										<p:column headerText="Dept" style="width:15%">
+											<h:outputText
+												value="#{member.personalInfo.employeeAsList[0].DEPFINANCE}" />
+										</p:column>
+										<p:column style="width:5%;text-align:center"
+											rendered="#{memberAssign.firstLevelAdmin}">
+											<p:commandButton title="Delete" icon="ui-icon-trash"
+												style="width:16px;height:16px"
+												action="#{memberAssign.deleteMember()}" process="@this"
+												update=":mainform:maintab:membertablecontainer">
+												<f:setPropertyActionListener
+													target="#{memberAssign.deletedMember}" value="#{member}" />
+											</p:commandButton>
+										</p:column>
+									</p:dataTable>
+								</h:panelGroup>
+							</h:panelGroup>
+						</p:tab>
+						<p:tab id="logtab" title="Log"
+							rendered="#{memberAssign.firstLevelAdmin}">
+							<h:panelGrid columns="5" cellpadding="3" id="searchloggrid">
+								<h:outputText value="Start:" />
+								<p:calendar value="#{memberAssign.startDate}"
+									pattern="dd/MM/yyyy" />
+								<h:outputText value="End:" />
+								<p:calendar value="#{memberAssign.endDate}" pattern="dd/MM/yyyy" />
+								<p:commandButton value="Search" icon="ui-icon-search"
+									onstart="blockLogList.show()" oncomplete="blockLogList.hide()"
+									process="@this, searchloggrid"
+									action="#{memberAssign.createLogList()}" update="loglist" />
+							</h:panelGrid>
+							<p:spacer height="10" />
+							<h:panelGroup id="loglistpanelgroup" layout="block">
+								<p:dataTable value="#{memberAssign.logList}" var="log" rows="20"
+									paginator="true" paginatorAlwaysVisible="false"
+									paginatorPosition="bottom" id="loglist">
+									<p:column headerText="Timestamp" style="width:10%"
+										sortBy="#{log.timeStamp}">
+										<div style="text-align: right">
+											<h:outputText value="#{log.timeStamp}">
+												<f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT+7" />
+											</h:outputText>
+											<h:outputText value=" - " />
+											<h:outputText value="#{log.timeStamp}">
+												<f:convertDateTime pattern="HH:mm" timeZone="GMT+7" />
+											</h:outputText>
+										</div>
+									</p:column>
+									<p:column headerText="Sub-Category" style="width:20%">
+										<h:outputText value="#{log.subCategory.description}" />
+									</p:column>
+									<p:column headerText="Actor" style="width:15%"
+										filterBy="#{log.staff}" filterMatchMode="contains">
+										<h:outputText value="#{log.staff}" />
+									</p:column>
+									<p:column headerText="Detail" style="width:25%">
+										<h:outputText value="#{log.detail}" />
+									</p:column>
+									<p:column headerText="Type" style="width:10%"
+										filterBy="#{log.logType.value}" filterMatchMode="exact"
+										filterOptions="#{memberAssign.logTypeFilterOptions}">
+										<h:outputText value="#{log.logType.value}" />
+									</p:column>
+									<p:column headerText="MD5" style="width:15%"
+										filterBy="#{log.md5}" filterMatchMode="contains">
+										<h:outputText value="#{log.md5}" />
+									</p:column>
+								</p:dataTable>
+							</h:panelGroup>
+						</p:tab>
+					</p:tabView>
+				</h:form>
+				<a
+					style="font-weight: bold; color: #333; position: absolute; right: 15px; top: 9px;"
+					href="http://online.aerothai.co.th/documents/document.pdf"
+					target="_blank"> <h:graphicImage
+						value="../resources/images/help-icon.png"
+						style="height:16px;width:16px;margin-bottom: -3px;" /> <h:outputText
+						value="Manual" style="margin-left:5px;" />
+				</a>
+			</h:panelGroup>
+		</pe:layoutPane>
+		<pe:layoutPane position="south" size="31"
+			styleContent="padding: 1ex !important;text-align:center"
+			resizable="false" closable="false">
+			<h:panelGroup layout="block"
+				style="width:100%;position:absolute;left:0px;text-align:left">
+				<h:outputText value="Version 1.0 Build 0007" />
+			</h:panelGroup>
+			<h:outputText
+				value="© Copyrights reserved 2012. Developed by ID.IT. มีปัญหาการใช้งานกรุณาติดต่อ พท.สท. โทร.8214"
+				style="font-weight:bold" />
+			<h:panelGroup layout="block"
+				style="width:100%;position:absolute;right:0px;top:5px;text-align:right">
+				<p:button value="Mobile Vers." href="/pages/main_m.jsf"
+					styleClass="mobilever_button"
+					style="height:22px;margin-right:5px;margin-bottom:2px;margin-top: -2px;" />
+			</h:panelGroup>
+		</pe:layoutPane>
+	</pe:layout>
+	<p:dialog header="New Folder" widgetVar="createNewFolderWidget"
+		resizable="false" showEffect="clip" hideEffect="clip">
+		<h:panelGrid columns="2" cellpadding="3" id="newfoldernamegrid">
+			<h:outputText value="Name:" />
+			<p:inputText value="#{memberAssign.newFolderName}" size="50" />
+			<h:outputText value="Restriction:" />
+			<p:selectOneButton value="#{memberAssign.selectedRestriction}">
+				<p:ajax update="restrictionoption, restrictiontext" />
+				<f:selectItem itemLabel="None" itemValue="none" />
+				<f:selectItem itemLabel="Department" itemValue="department" />
+				<f:selectItem itemLabel="Position" itemValue="position" />
+			</p:selectOneButton>
+			<h:panelGroup layout="block" id="restrictiontext">
+				<h:outputText value="Department:"
+					rendered="#{memberAssign.selectedRestriction == 'department'}" />
+				<h:outputText value="Position:"
+					rendered="#{memberAssign.selectedRestriction == 'position'}" />
+			</h:panelGroup>
+			<h:panelGroup layout="block" id="restrictionoption">
+				<p:selectOneMenu value="#{memberAssign.selectedDepartment}"
+					rendered="#{memberAssign.selectedRestriction == 'department'}">
+					<f:selectItems value="#{memberAssign.departmentSelectItemList}" />
+				</p:selectOneMenu>
+				<p:selectOneMenu value="#{memberAssign.selectedPosition}"
+					rendered="#{memberAssign.selectedRestriction == 'position'}">
+					<f:selectItems value="#{memberAssign.positionSelectItemList}" />
+				</p:selectOneMenu>
+			</h:panelGroup>
+		</h:panelGrid>
+		<p:separator />
+		<p:commandButton value="Create" process="@this, newfoldernamegrid"
+			action="#{memberAssign.createNewFolder()}"
+			onstart="blockTable.show()"
+			oncomplete="createNewFolderWidget.hide(); blockTable.hide();"
+			update=":mainform:maintab:treetablecontainer, newfoldernamegrid"
+			icon="ui-icon-plus" />
+	</p:dialog>
+	<p:dialog header="Sub Folder" widgetVar="createSubFolderWidget"
+		resizable="false" showEffect="clip" hideEffect="clip">
+		<h:panelGrid columns="3" cellpadding="3" id="subfoldernamegrid">
+			<h:outputText value="Name:" />
+			<p:inputText value="#{memberAssign.subFolderName}" />
+			<p:commandButton value="Create" process="@this, subfoldernamegrid"
+				action="#{memberAssign.createSubFolder()}"
+				onstart="blockTable.show()"
+				oncomplete="createSubFolderWidget.hide(); blockTable.hide()"
+				update=":mainform:maintab:treetablecontainer, subfoldernamegrid"
+				icon="ui-icon-plus" />
+		</h:panelGrid>
+	</p:dialog>
+	<p:dialog header="Upload Files" widgetVar="fileUploadWidget"
+		resizable="false" showEffect="clip" hideEffect="clip">
+		<h:form enctype="multipart/form-data">
+			<p:remoteCommand name="submitDescription" process="filedescription" />
+			<h:panelGrid columns="2" cellpadding="3" id="uploadgrid">
+				<h:outputText value="Description:" />
+				<p:inputText value="#{memberAssign.fileDescription}"
+					id="filedescription" style="width:300px" />
+				<h:outputText value="" />
+				<p:fileUpload mode="advanced" multiple="true"
+					fileUploadListener="#{memberAssign.handleFileUpload()}"
+					update=":mainform:maintab:treetablecontainer"
+					onstart="submitDescription()" process="@this" />
+			</h:panelGrid>
+		</h:form>
+	</p:dialog>
+	<p:dialog header="Edit Category / Sub-Category Name"
+		widgetVar="editCategoryWidget" resizable="false" showEffect="clip"
+		hideEffect="clip">
+		<h:panelGrid columns="3" cellpadding="3" id="editcategorygrid">
+			<h:outputText value="Category Name:"
+				rendered="#{memberAssign.selectedCategoryNode.type == 'default'}" />
+			<p:inputText value="#{memberAssign.editCategory.name}"
+				rendered="#{memberAssign.selectedCategoryNode.type == 'default'}" />
+			<p:commandButton value="Save" icon="ui-icon-disk"
+				process="@this, editcategorygrid"
+				action="#{memberAssign.saveEditedCategory()}"
+				onstart="blockCategoryTree.show()"
+				oncomplete="editCategoryWidget.hide();blockCategoryTree.hide()"
+				rendered="#{memberAssign.selectedCategoryNode.type == 'default'}"
+				update=":westform:categorytree" />
+			<h:outputText value="Sub-Category Name:"
+				rendered="#{memberAssign.selectedCategoryNode.type != 'default'}" />
+			<p:inputText value="#{memberAssign.editSubCategory.description}"
+				rendered="#{memberAssign.selectedCategoryNode.type != 'default'}" />
+			<p:commandButton value="Save" icon="ui-icon-disk"
+				process="@this, editcategorygrid"
+				action="#{memberAssign.saveEditedMeeting()}"
+				onstart="blockCategoryTree.show()"
+				oncomplete="editCategoryWidget.hide();blockCategoryTree.hide()"
+				rendered="#{memberAssign.selectedCategoryNode.type != 'default'}"
+				update=":westform:categorytree, :mainform:maintab:memberinputpanelgrid" />
+		</h:panelGrid>
+	</p:dialog>
+	<p:dialog header="Edit Document" widgetVar="editDocumentWidget"
+		resizable="false" showEffect="clip" hideEffect="clip"
+		id="editdocdialog">
+		<h:form enctype="multipart/form-data" id="editdocform">
+			<h:panelGrid columns="2" cellpadding="3" id="editdocgrid">
+				<h:outputText value="Name:" />
+				<p:inputText value="#{memberAssign.editDocument.fileName}" size="50" />
+				<h:outputText value="Description:"
+					rendered="#{memberAssign.editDocument.folder == false}" />
+				<p:inputText value="#{memberAssign.editDocument.description}"
+					rendered="#{memberAssign.editDocument.folder == false}" size="50"
+					id="des_input_text" />
+				<h:outputText value=""
+					rendered="#{memberAssign.editDocument.folder == false}" />
+				<p:fileUpload mode="simple" value="#{memberAssign.file}"
+					rendered="#{memberAssign.editDocument.folder == false}" />
+				<h:outputText value="Restriction:"
+					rendered="#{memberAssign.editDocument.folder == true}" />
+				<p:selectOneButton value="#{memberAssign.selectedRestriction}"
+					rendered="#{memberAssign.editDocument.folder == true}">
+					<p:ajax update="editrestrictiontext, editrestrictionoption" />
+					<f:selectItem itemLabel="None" itemValue="none" />
+					<f:selectItem itemLabel="Department" itemValue="department" />
+					<f:selectItem itemLabel="Position" itemValue="position" />
+				</p:selectOneButton>
+				<h:panelGroup layout="block" id="editrestrictiontext">
+					<h:outputText value="Department:"
+						rendered="#{memberAssign.editDocument.folder == true and memberAssign.selectedRestriction == 'department'}" />
+					<h:outputText value="Position:"
+						rendered="#{memberAssign.editDocument.folder == true and memberAssign.selectedRestriction == 'position'}" />
+				</h:panelGroup>
+				<h:panelGroup layout="block" id="editrestrictionoption">
+					<p:selectOneMenu value="#{memberAssign.selectedDepartment}"
+						rendered="#{memberAssign.editDocument.folder == true and memberAssign.selectedRestriction == 'department'}">
+						<f:selectItems value="#{memberAssign.departmentSelectItemList}" />
+					</p:selectOneMenu>
+					<p:selectOneMenu value="#{memberAssign.selectedPosition}"
+						rendered="#{memberAssign.editDocument.folder == true and memberAssign.selectedRestriction == 'position'}">
+						<f:selectItems value="#{memberAssign.positionSelectItemList}" />
+					</p:selectOneMenu>
+				</h:panelGroup>
+			</h:panelGrid>
+			<p:separator />
+			<h:panelGrid columns="1" id="editdocbutngrid">
+				<p:commandButton value="Save" icon="ui-icon-disk"
+					process="@this, editdocgrid"
+					action="#{memberAssign.saveEditedDocument()}"
+					update="editdocgrid, :mainform:maintab:treetablecontainer"
+					onstart="blockTable.show()"
+					oncomplete="editDocumentWidget.hide(); blockTable.hide())"
+					ajax="false"
+					rendered="#{memberAssign.editDocument.folder == false}" />
+				<p:commandButton value="Save" icon="ui-icon-disk"
+					process="@this, editdocgrid"
+					action="#{memberAssign.saveEditedDocument()}"
+					update="editdocgrid, :mainform:maintab:treetablecontainer"
+					onstart="blockTable.show()"
+					oncomplete="editDocumentWidget.hide(); blockTable.hide()"
+					rendered="#{memberAssign.editDocument.folder != false}" />
+			</h:panelGrid>
+		</h:form>
+	</p:dialog>
+	<p:dialog widgetVar="moveFileWidget" resizable="false"
+		showEffect="clip" hideEffect="clip" id="movefiledialog"
+		header="Move File ( #{memberAssign.editDocument.fileName} )">
+		<h:panelGrid columns="1" cellpadding="3" id="movetreegrid">
+			<p:tree style="padding:0em" id="movetree"
+				value="#{memberAssign.moveDocumentTree}" var="node"
+				selectionMode="single" selection="#{memberAssign.destinationNode}"
+				highlight="true">
+				<p:ajax event="select" process="@this" update="movetree"
+					listener="#{memberAssign.expandMoveTree()}" />
+				<p:ajax event="expand" process="@this"
+					listener="#{memberAssign.reserveMoveTreeExpandState()}" />
+				<p:ajax event="collapse" process="@this"
+					listener="#{memberAssign.reserveMoveTreeCollapseState()}" />
+				<p:treeNode>
+					<h:graphicImage value="../resources/images/generic_folder.png"
+						style="margin-right:3px;height:16px;width:16px;margin-bottom:-2px" />
+					<h:outputText value="#{node.fileName}" />
+				</p:treeNode>
+			</p:tree>
+			<p:commandButton value="Move" icon="ui-icon-transfer-e-w"
+				process="@this, movetreegrid"
+				action="#{memberAssign.moveDocument()}"
+				update=":mainform:maintab:treetablecontainer"
+				onstart="blockTable.show()"
+				oncomplete="blockTable.hide();moveFileWidget.hide()" />
+		</h:panelGrid>
+	</p:dialog>
+	<p:dialog widgetVar="reorderWidget" resizable="false" showEffect="clip"
+		hideEffect="clip" header="Reorder">
+		<h:panelGrid columns="1" id="ordergrid">
+			<p:orderList value="#{memberAssign.orderList}" var="name"
+				controlsLocation="right" itemLabel="#{name}" itemValue="#{name}"
+				id="orderlist" />
+			<p:commandButton value="Save" action="#{memberAssign.saveOrder()}"
+				process="@this, ordergrid" icon="ui-icon-disk"
+				oncomplete="reorderWidget.hide()" update=":westform:categorytree" />
+		</h:panelGrid>
+	</p:dialog>
+	<p:confirmDialog
+		message="This document will be deleted, do you want to proceed ?"
+		header="Confirmation Dialog" widgetVar="deleteDocumentCOnfirm"
+		id="confirmdialog">
+		<p:commandButton value="Delete" process="@this"
+			action="#{memberAssign.deleteDocument()}"
+			update=":mainform:maintab:treetablecontainer" widgetVar="deleteBtn"
+			oncomplete="deleteDocumentCOnfirm.hide();deleteBtn.enable();cancelBtn.enable()"
+			onstart="deleteBtn.disable();cancelBtn.disable()" />
+		<p:commandButton value="Cancel" type="button" widgetVar="cancelBtn"
+			onclick="deleteDocumentCOnfirm.hide()" />
+	</p:confirmDialog>
+	<p:confirmDialog
+		message="This category will be deleted, do you want to proceed ?"
+		header="Confirmation Dialog" widgetVar="deleteCategoryConfirm">
+		<p:commandButton value="Delete"
+			action="#{memberAssign.deleteCategory()}" process="@this"
+			update=":westform:categorytree, :mainform:maintab:treetablecontainer, :mainform:maintab:memberinputpanelgrid, :mainform:maintab:membertablecontainer, :mainform:maintab:buttongrid"
+			widgetVar="catDeleteBtn"
+			onstart="catDeleteBtn.disable();catCancelBtn.disable()"
+			oncomplete="catDeleteBtn.enable();catCancelBtn.enable();deleteCategoryConfirm.hide()" />
+		<p:commandButton value="Cancel" type="button"
+			onclick="deleteCategoryConfirm.hide()" widgetVar="catCancelBtn" />
+	</p:confirmDialog>
+</body>
+</html>
